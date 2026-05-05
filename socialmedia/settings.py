@@ -10,9 +10,13 @@ SECRET_KEY = os.environ.get(
     'django-insecure-default-key-change-this'
 )
 
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'   
 
-ALLOWED_HOSTS = ['.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '.onrender.com'
+]
 
 
 # 📦 APPS
@@ -30,7 +34,7 @@ INSTALLED_APPS = [
 # 🧠 MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ⭐ REQUIRED
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ MUST for Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,6 +47,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'socialmedia.urls'
 
 
+# 🧠 TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -63,7 +68,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
 
-# 🗄️ DATABASE
+# 🗄️ DATABASE (SQLite for Render free)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -83,7 +88,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # 🌍 INTERNATIONALIZATION
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
@@ -101,7 +106,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-# 🔑 DEFAULT PRIMARY KEY
+# 🔑 DEFAULT AUTO FIELD
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
