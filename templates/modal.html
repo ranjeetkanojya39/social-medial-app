@@ -1,130 +1,547 @@
 {% load static %}
 
 <style>
-/* 🌈 Glass Modal */
-.modal-content{
-    border-radius:20px;
-    border:none;
-    background:linear-gradient(135deg,#667eea,#764ba2);
-    color:white;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+/* ── Upload Modal ───────────────────────────────────────── */
+#uploadModal .modal-dialog {
+    max-width: 480px;
 }
 
-/* Header */
-.modal-header{
-    border:none;
+#uploadModal .modal-content {
+    border: none;
+    border-radius: 20px;
+    background: var(--surface, #fff);
+    box-shadow: 0 24px 64px rgba(0,0,0,.18);
+    overflow: hidden;
 }
 
-/* Inputs */
-.form-control{
-    border-radius:12px;
-    border:none;
-    background:rgba(255,255,255,0.2);
-    color:white;
+#uploadModal .modal-header {
+    border: none;
+    padding: 22px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.form-control::placeholder{
-    color:#ddd;
+#uploadModal .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a1a);
+    letter-spacing: -.2px;
 }
 
-.form-control:focus{
-    background:rgba(255,255,255,0.3);
-    box-shadow:none;
+#uploadModal .btn-close {
+    background: var(--bg, #f5f4f0);
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary, #7a7570);
+    transition: background .2s;
+    flex-shrink: 0;
 }
 
-/* Upload box */
-.upload-box{
-    border:2px dashed white;
-    border-radius:15px;
-    padding:20px;
-    text-align:center;
-    cursor:pointer;
-    transition:0.3s;
+#uploadModal .btn-close:hover { background: var(--border, #e8e4de); }
+
+#uploadModal .modal-body {
+    padding: 20px 24px 24px;
 }
 
-.upload-box:hover{
-    background:rgba(255,255,255,0.1);
+/* ── Step indicator ─────────────────────────────────────── */
+.upload-steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
-/* Preview */
-.preview-img{
-    width:100%;
-    max-height:250px;
-    object-fit:cover;
-    border-radius:10px;
-    margin-top:10px;
+.upload-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary, #7a7570);
+    transition: color .3s;
 }
 
-/* Buttons */
-.btn-primary{
-    background:#ff7eb3;
-    border:none;
-    border-radius:10px;
+.upload-step.active { color: var(--accent, #e05c2a); }
+
+.step-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--bg, #f5f4f0);
+    border: 1.5px solid var(--border, #e8e4de);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    transition: all .3s;
 }
 
-.btn-primary:hover{
-    background:#ff4e9b;
+.upload-step.active .step-dot {
+    background: var(--accent, #e05c2a);
+    border-color: var(--accent, #e05c2a);
+    color: #fff;
 }
 
-.btn-secondary{
-    border-radius:10px;
+.upload-step.done .step-dot {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
 }
+
+.step-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border, #e8e4de);
+}
+
+/* ── Drop Zone ──────────────────────────────────────────── */
+.drop-zone {
+    border: 2px dashed var(--border, #e8e4de);
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .25s ease;
+    background: var(--bg, #f5f4f0);
+    position: relative;
+    overflow: hidden;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: var(--accent, #e05c2a);
+    background: rgba(224,92,42,.04);
+}
+
+.drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.drop-icon {
+    width: 56px; height: 56px;
+    background: var(--surface, #fff);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    font-size: 24px;
+    color: var(--accent, #e05c2a);
+    transition: transform .2s;
+}
+
+.drop-zone:hover .drop-icon { transform: translateY(-3px); }
+
+.drop-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+    margin-bottom: 4px;
+}
+
+.drop-sub {
+    font-size: 12px;
+    color: var(--text-secondary, #7a7570);
+}
+
+.drop-formats {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 14px;
+}
+
+.fmt-badge {
+    background: var(--surface, #fff);
+    border: 1px solid var(--border, #e8e4de);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary, #7a7570);
+}
+
+/* ── Preview ────────────────────────────────────────────── */
+.preview-wrap {
+    display: none;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 1 / 1;
+}
+
+.preview-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.preview-overlay {
+    position: absolute;
+    top: 10px; right: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.preview-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(6px);
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+}
+
+.preview-btn:hover { background: rgba(0,0,0,.8); }
+
+/* ── Caption area ───────────────────────────────────────── */
+.caption-section { margin-top: 16px; }
+
+.caption-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary, #7a7570);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.caption-input-wrap {
+    position: relative;
+}
+
+.caption-input-wrap textarea {
+    width: 100%;
+    background: var(--bg, #f5f4f0);
+    border: 1.5px solid var(--border, #e8e4de);
+    border-radius: 12px;
+    padding: 12px 14px 28px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary, #1a1a1a);
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color .2s;
+    min-height: 88px;
+}
+
+.caption-input-wrap textarea:focus {
+    border-color: var(--accent, #e05c2a);
+    background: var(--surface, #fff);
+}
+
+.caption-input-wrap textarea::placeholder {
+    color: var(--text-secondary, #7a7570);
+}
+
+.char-counter {
+    position: absolute;
+    bottom: 10px; right: 12px;
+    font-size: 11px;
+    color: var(--text-secondary, #7a7570);
+    transition: color .2s;
+}
+
+.char-counter.warn { color: #f59e0b; }
+.char-counter.over { color: #ef4444; }
+
+/* ── Footer buttons ─────────────────────────────────────── */
+.modal-footer-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 11px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border, #e8e4de);
+    background: transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary, #7a7570);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+}
+
+.btn-cancel:hover {
+    background: var(--bg, #f5f4f0);
+    color: var(--text-primary, #1a1a1a);
+}
+
+.btn-post {
+    flex: 2;
+    padding: 11px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent, #e05c2a) 0%, var(--accent2, #c9406e) 100%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity .2s, transform .15s;
+}
+
+.btn-post:hover  { opacity: .9; }
+.btn-post:active { transform: scale(.97); }
+
+.btn-post:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading spinner in button */
+.btn-post .spinner {
+    display: none;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn-post.loading .spinner   { display: block; }
+.btn-post.loading .btn-label { display: none; }
 </style>
 
-<div class="modal fade" id="exampleModal" tabindex="-1">
+<!-- ── Upload Modal ──────────────────────────────────────── -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-3">
+        <div class="modal-content">
 
-```
-        <div class="modal-header">
-            <h5 class="modal-title">✨ Create Post</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Create Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-        <div class="modal-body">
+            <div class="modal-body">
 
-            <form action="upload" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-
-                <!-- Upload -->
-                <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                    <img src="{% static 'css/upload.png' %}" width="50"><br>
-                    <small>Click to upload photo</small>
-                    <input type="file" name="image_upload" id="fileInput" hidden onchange="previewImage(event)">
+                <!-- Step indicator -->
+                <div class="upload-steps">
+                    <div class="upload-step active" id="step1">
+                        <div class="step-dot">1</div>
+                        <span>Photo</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="upload-step" id="step2">
+                        <div class="step-dot">2</div>
+                        <span>Caption</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="upload-step" id="step3">
+                        <div class="step-dot">3</div>
+                        <span>Share</span>
+                    </div>
                 </div>
 
-                <!-- Preview -->
-                <img id="preview" class="preview-img d-none">
+                <form action="/upload/" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
 
-                <!-- Caption -->
-                <div class="mt-3">
-                    <label>Caption</label>
-                    <textarea class="form-control" name="caption" placeholder="Write something cool..."></textarea>
-                </div>
+                    <!-- Drop zone (hidden once image chosen) -->
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" name="image_upload" id="fileInput"
+                               accept="image/jpeg,image/png,image/webp,image/gif"
+                               required>
+                        <div class="drop-icon">
+                            <i class="fa-solid fa-image"></i>
+                        </div>
+                        <div class="drop-title">Drop your photo here</div>
+                        <div class="drop-sub">or click to browse from your device</div>
+                        <div class="drop-formats">
+                            <span class="fmt-badge">JPG</span>
+                            <span class="fmt-badge">PNG</span>
+                            <span class="fmt-badge">WEBP</span>
+                            <span class="fmt-badge">GIF</span>
+                        </div>
+                    </div>
 
-                <!-- Buttons -->
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary px-4">Post 🚀</button>
-                </div>
+                    <!-- Preview -->
+                    <div class="preview-wrap" id="previewWrap">
+                        <img id="previewImg" src="" alt="Preview">
+                        <div class="preview-overlay">
+                            <button type="button" class="preview-btn" id="changeImgBtn"
+                                    title="Change photo">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </button>
+                        </div>
+                    </div>
 
-            </form>
+                    <!-- Caption -->
+                    <div class="caption-section">
+                        <label class="caption-label" for="captionInput">Caption</label>
+                        <div class="caption-input-wrap">
+                            <textarea id="captionInput" name="caption"
+                                      placeholder="Write something about this post…"
+                                      maxlength="2200"
+                                      rows="3"></textarea>
+                            <span class="char-counter" id="charCount">0 / 2200</span>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="modal-footer-btns">
+                        <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-post" id="postBtn" disabled>
+                            <div class="spinner"></div>
+                            <span class="btn-label">
+                                <i class="fa-solid fa-paper-plane"></i> Share Post
+                            </span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
 
         </div>
     </div>
 </div>
-```
-
-</div>
 
 <script>
-function previewImage(event){
-    let file = event.target.files[0];
-    let preview = document.getElementById("preview");
+(function () {
+    const fileInput   = document.getElementById('fileInput');
+    const dropZone    = document.getElementById('dropZone');
+    const previewWrap = document.getElementById('previewWrap');
+    const previewImg  = document.getElementById('previewImg');
+    const changeBtn   = document.getElementById('changeImgBtn');
+    const captionEl   = document.getElementById('captionInput');
+    const charCount   = document.getElementById('charCount');
+    const postBtn     = document.getElementById('postBtn');
+    const uploadForm  = document.getElementById('uploadForm');
+    const modal       = document.getElementById('uploadModal');
 
-    if(file){
-        preview.src = URL.createObjectURL(file);
-        preview.classList.remove("d-none");
+    // ── File chosen ────────────────────────────────────────
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        showPreview(file);
+    });
+
+    function showPreview(file) {
+        const url = URL.createObjectURL(file);
+        previewImg.src = url;
+        dropZone.style.display  = 'none';
+        previewWrap.style.display = 'block';
+        postBtn.disabled = false;
+
+        // Update steps
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step1').classList.add('done');
+        document.getElementById('step2').classList.add('active');
     }
-}
+
+    // ── Change image ────────────────────────────────────────
+    changeBtn.addEventListener('click', function () {
+        fileInput.value = '';
+        previewImg.src = '';
+        previewWrap.style.display = 'none';
+        dropZone.style.display    = 'block';
+        postBtn.disabled = true;
+
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('step1').classList.remove('done');
+        document.getElementById('step2').classList.remove('active');
+    });
+
+    // ── Drag & drop ─────────────────────────────────────────
+    dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            // Manually assign to input (DataTransfer)
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            fileInput.files = dt.files;
+            showPreview(file);
+        }
+    });
+
+    // ── Caption counter ──────────────────────────────────────
+    captionEl.addEventListener('input', function () {
+        const len = this.value.length;
+        charCount.textContent = len + ' / 2200';
+        charCount.classList.toggle('warn', len > 1800 && len <= 2200);
+        charCount.classList.toggle('over', len > 2200);
+
+        if (len > 0) {
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step2').classList.add('done');
+            document.getElementById('step3').classList.add('active');
+        } else {
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('step2').classList.remove('done');
+            document.getElementById('step3').classList.remove('active');
+        }
+    });
+
+    // ── Form submit — show loading state ────────────────────
+    uploadForm.addEventListener('submit', function () {
+        postBtn.classList.add('loading');
+        postBtn.disabled = true;
+    });
+
+    // ── Reset modal when closed ──────────────────────────────
+    modal.addEventListener('hidden.bs.modal', function () {
+        fileInput.value = '';
+        previewImg.src  = '';
+        captionEl.value = '';
+        charCount.textContent = '0 / 2200';
+        previewWrap.style.display = 'none';
+        dropZone.style.display    = 'block';
+        postBtn.disabled = true;
+        postBtn.classList.remove('loading');
+
+        ['step1','step2','step3'].forEach(id => {
+            document.getElementById(id).classList.remove('active','done');
+        });
+        document.getElementById('step1').classList.add('active');
+    });
+})();
 </script>

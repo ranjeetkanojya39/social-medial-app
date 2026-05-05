@@ -5,380 +5,563 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Social Media</title>
+<title>Social Hub</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://kit.fontawesome.com/cb792c0850.js" crossorigin="anonymous"></script>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+/* ── Reset & Base ──────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+    --sidebar-w: 240px;
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e8e4de;
+    --text-primary: #1a1a1a;
+    --text-secondary: #7a7570;
+    --accent: #e05c2a;
+    --accent2: #c9406e;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+    --transition: .2s ease;
 }
 
-body{
-    background:#fafafa;
-    font-family:'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary);
+    line-height: 1.5;
 }
 
-/* 🔥 Sidebar */
-.sidebar{
-    position:fixed;
-    top:0;
-    left:0;
-    width:250px;
-    height:100vh;
-    background:#fff;
-    border-right:1px solid #dbdbdb;
-    padding:20px 0;
-    z-index:1000;
-    overflow-y:auto;
+/* ── Sidebar ───────────────────────────────────────────── */
+.sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0 20px;
+    z-index: 1000;
+    overflow-y: auto;
+    transition: transform var(--transition);
 }
 
-.sidebar .logo{
-    padding:20px 25px;
-    font-size:28px;
-    font-weight:bold;
-    background:linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
+.sidebar-logo {
+    padding: 0 24px 28px;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -.3px;
 }
 
-.sidebar .profile-section{
-    padding:0 25px;
-    margin-bottom:20px;
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
 }
 
-.profile-pic{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    border:2px solid #dbdbdb;
-    object-fit:cover;
+.sidebar-profile img {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
 }
 
-.sidebar a{
-    color:#262626;
-    display:flex;
-    align-items:center;
-    padding:12px 25px;
-    text-decoration:none;
-    transition:all 0.2s ease;
-    font-size:16px;
-    font-weight:400;
+.sidebar-profile-info strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-.sidebar a i{
-    font-size:24px;
-    margin-right:15px;
-    width:24px;
+.sidebar-profile-info span {
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
-.sidebar a:hover{
-    background:#fafafa;
+.sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 24px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 0;
+    transition: background var(--transition), color var(--transition);
+    position: relative;
 }
 
-.sidebar a.active{
-    font-weight:bold;
+.sidebar nav a i {
+    width: 20px;
+    font-size: 18px;
+    color: var(--text-secondary);
+    transition: color var(--transition);
+    text-align: center;
 }
 
-/* 🔥 Main Content */
-.main{
-    margin-left:250px;
-    padding:30px 0;
-    min-height:100vh;
+.sidebar nav a:hover {
+    background: var(--bg);
+    color: var(--accent);
 }
 
-.feed-container{
-    max-width:470px;
-    margin:0 auto;
+.sidebar nav a:hover i { color: var(--accent); }
+
+.sidebar nav a.active {
+    font-weight: 600;
+    color: var(--accent);
+    background: linear-gradient(90deg, rgba(224,92,42,.08) 0%, transparent 100%);
 }
 
-/* 🔥 Post Card - Instagram Style */
-.post-card{
-    background:#fff;
-    border:1px solid #dbdbdb;
-    border-radius:8px;
-    margin-bottom:20px;
-    overflow:hidden;
+.sidebar nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    border-radius: 0 2px 2px 0;
+}
+
+.sidebar nav a.active i { color: var(--accent); }
+
+.sidebar-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+}
+
+/* ── Mobile Top Nav ────────────────────────────────────── */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1000;
+}
+
+.mobile-nav .mobile-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mobile-nav-icons { display: flex; gap: 20px; }
+.mobile-nav-icons a { color: var(--text-primary); font-size: 20px; text-decoration: none; }
+
+/* Mobile Bottom Tab Bar */
+.mobile-tabs {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1000;
+}
+
+.mobile-tabs a {
+    color: var(--text-secondary);
+    font-size: 22px;
+    text-decoration: none;
+    padding: 8px;
+    transition: color var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mobile-tabs a.active,
+.mobile-tabs a:hover { color: var(--accent); }
+
+.mobile-tabs .tab-profile-pic {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+}
+
+.mobile-tabs a.active .tab-profile-pic {
+    border-color: var(--accent);
+}
+
+/* ── Main Content ──────────────────────────────────────── */
+.main-content {
+    margin-left: var(--sidebar-w);
+    padding: 32px 16px;
+    min-height: 100vh;
+}
+
+.feed-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ── Post Card ─────────────────────────────────────────── */
+.post-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: box-shadow var(--transition);
+}
+
+.post-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,.09), 0 8px 24px rgba(0,0,0,.06);
 }
 
 /* Post Header */
-.post-header{
-    display:flex;
-    align-items:center;
-    padding:14px 16px;
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
 }
 
-.post-header img{
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    margin-right:12px;
-    object-fit:cover;
-    border:1px solid #dbdbdb;
+.post-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.post-header .username{
-    font-weight:600;
-    font-size:14px;
-    color:#262626;
-    text-decoration:none;
+.post-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
 }
 
-.post-header .username:hover{
-    text-decoration:underline;
+.post-username {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+.post-username:hover { text-decoration: underline; color: var(--accent); }
+
+/* ── UNIFORM IMAGE ─────────────────────────────────────── */
+/* Every post image is exactly 1:1 square, object-fit cover = no whitespace */
+.post-img-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;   /* perfect square every time */
+    background: #f0eeea;
+    overflow: hidden;
 }
 
-/* ✅ FIXED IMAGE - No Overflow, Perfect Fit */
-.post-image-container{
-    width:100%;
-    max-height:585px;
-    overflow:hidden;
-    background:#000;
-    position:relative;
+.post-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;      /* crops to fill — no black bars */
+    display: block;
+    transition: transform .35s ease;
 }
 
-.post-image{
-    width:100%;
-    height:100%;
-    max-height:585px;
-    object-fit:contain;
-    display:block;
+.post-card:hover .post-img-wrap img {
+    transform: scale(1.02);
 }
 
 /* Post Actions */
-.post-actions{
-    padding:8px 16px;
-    display:flex;
-    align-items:center;
-    gap:15px;
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 10px 4px;
 }
 
-.action-btn{
-    background:none;
-    border:none;
-    cursor:pointer;
-    font-size:24px;
-    padding:8px;
-    transition:all 0.2s;
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 6px 8px;
+    color: var(--text-primary);
+    transition: color var(--transition), transform .15s ease;
+    border-radius: 8px;
+    line-height: 1;
 }
 
-.action-btn:hover{
-    opacity:0.6;
+.action-btn:hover { background: var(--bg); }
+.action-btn:active { transform: scale(.9); }
+
+.like-btn.liked { color: #ed4956; }
+
+.like-btn.liked i { animation: heartPop .3s ease; }
+
+@keyframes heartPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    70%  { transform: scale(.9); }
+    100% { transform: scale(1); }
 }
 
-.like-btn{
-    color:#262626;
+/* Likes + Caption + Time */
+.post-meta {
+    padding: 2px 14px 14px;
 }
 
-.like-btn.liked{
-    color:#ed4956;
-    animation:likeAnim 0.3s ease;
+.likes-count {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-primary);
 }
 
-@keyframes likeAnim{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.3);}
-    100%{transform:scale(1);}
+.post-caption {
+    font-size: 13.5px;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+    line-height: 1.5;
 }
 
-/* Likes Count */
-.likes-count{
-    padding:0 16px;
-    font-size:14px;
-    font-weight:600;
-    color:#262626;
-    margin-bottom:8px;
+.post-caption .cap-user {
+    font-weight: 600;
+    margin-right: 5px;
+    text-decoration: none;
+    color: var(--text-primary);
+}
+.post-caption .cap-user:hover { color: var(--accent); }
+
+.post-time {
+    font-size: 10px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-top: 6px;
 }
 
-/* Caption */
-.post-caption{
-    padding:0 16px;
-    font-size:14px;
-    color:#262626;
-    margin-bottom:8px;
+/* ── Empty Feed ────────────────────────────────────────── */
+.empty-feed {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-secondary);
 }
 
-.post-caption .username{
-    font-weight:600;
-    text-decoration:none;
-    color:#262626;
-    margin-right:5px;
+.empty-feed i { font-size: 52px; opacity: .25; margin-bottom: 16px; display: block; }
+.empty-feed h5 { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+.sidebar::-webkit-scrollbar { width: 5px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 900px) {
+    :root { --sidebar-w: 200px; }
+    .sidebar-logo { font-size: 20px; }
+    .sidebar nav a { font-size: 13px; padding: 10px 18px; }
+    .sidebar-profile-info { display: none; }
 }
 
-.post-caption .username:hover{
-    text-decoration:underline;
-}
+@media (max-width: 680px) {
+    .sidebar { display: none; }
 
-/* Timestamp */
-.post-time{
-    padding:0 16px 16px;
-    font-size:10px;
-    color:#8e8e8e;
-    text-transform:uppercase;
-    letter-spacing:0.2px;
-}
+    .mobile-nav  { display: flex; }
+    .mobile-tabs { display: flex; }
 
-/* Scrollbar */
-.sidebar::-webkit-scrollbar{
-    width:8px;
-}
-
-.sidebar::-webkit-scrollbar-track{
-    background:#fff;
-}
-
-.sidebar::-webkit-scrollbar-thumb{
-    background:#dbdbdb;
-    border-radius:4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover{
-    background:#b3b3b3;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px){
-    .sidebar{
-        width:100%;
-        height:auto;
-        position:relative;
-        border-right:none;
-        border-bottom:1px solid #dbdbdb;
+    .main-content {
+        margin-left: 0;
+        padding: 68px 0 72px;   /* top = mobile nav h, bottom = tab bar h */
     }
-    
-    .main{
-        margin-left:0;
-        padding:20px 10px;
+
+    .feed-wrap {
+        max-width: 100%;
+        padding: 0 12px;
     }
-    
-    .feed-container{
-        max-width:100%;
+
+    .post-card {
+        border-radius: 10px;
     }
-    
-    .sidebar a{
-        padding:10px 15px;
-        font-size:14px;
-    }
-    
-    .sidebar a i{
-        font-size:20px;
-        margin-right:10px;
-    }
+}
+
+@media (max-width: 400px) {
+    .feed-wrap { padding: 0 6px; }
+    .post-card { border-radius: 8px; }
 }
 </style>
-
 </head>
 
 <body>
 
-<!-- 🔥 Sidebar -->
-<div class="sidebar">
-    <div class="logo">
-        Social Hub
+<!-- ── Desktop Sidebar ──────────────────────────────────── -->
+<aside class="sidebar">
+    <div class="sidebar-logo">Social Hub</div>
+
+    <div class="sidebar-profile">
+        <img src="{{profile.profileimg.url}}" alt="{{user}}">
+        <div class="sidebar-profile-info">
+            <strong>{{user}}</strong>
+            <span>My Profile</span>
+        </div>
     </div>
 
-    <div class="profile-section">
-        <img src="{{profile.profileimg.url}}" class="profile-pic">
-        <h6 class="mt-2 mb-0">@{{user}}</h6>
+    <nav>
+        <a href="/" class="active"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/explore/"><i class="fa-solid fa-compass"></i> Explore</a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i> Create</a>
+        <a href="/profile/{{user}}"><i class="fa-solid fa-circle-user"></i> Profile</a>
+
+        <div class="sidebar-footer">
+            <a href="/logoutt/"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </nav>
+</aside>
+
+<!-- ── Mobile Top Bar ───────────────────────────────────── -->
+<header class="mobile-nav">
+    <span class="mobile-logo">Social Hub</span>
+    <div class="mobile-nav-icons">
+        <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i></a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa-solid fa-magnifying-glass"></i></a>
     </div>
+</header>
 
-    <a href="/" class="active"><i class="fa fa-home"></i> Home</a>
-    <a href="/explore"><i class="fa fa-compass"></i> Explore</a>
-    <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal3"><i class="fa fa-search"></i> Search</a>
-    <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-plus-square"></i> Create</a>
-    <a href="/profile/{{user}}"><i class="fa fa-user-circle"></i> Profile</a>
-    <a href="/logoutt"><i class="fa fa-sign-out-alt"></i> Logout</a>
-</div>
+<!-- ── Feed ─────────────────────────────────────────────── -->
+<main class="main-content">
+    <div class="feed-wrap">
 
-<!-- 🔥 Main Feed -->
-<div class="main">
-    <div class="feed-container">
+        {% include "modal.html" %}
+        {% include "search.html" %}
 
-    {% include "modal.html" %}
-    {% include "search.html" %}
+        {% if post %}
+            {% for pos in post %}
+            <article class="post-card">
 
-    {% for pos in post %}
-    <div class="post-card">
+                <!-- Header -->
+                <div class="post-header">
+                    <div class="post-header-left">
+                        <img src="{{profile.profileimg.url}}" class="post-avatar" alt="{{pos.user}}">
+                        <a href="/profile/{{pos.user}}" class="post-username">{{pos.user}}</a>
+                    </div>
 
-        <!-- Post Header -->
-        <div class="post-header">
-            <img src="{{profile.profileimg.url}}" alt="{{pos.user}}">
-            <a href="/profile/{{pos.user}}" class="username">{{pos.user}}</a>
-        </div>
+                    {% if pos.user == user.username %}
+                    <a href="/delete/{{pos.id}}"
+                       onclick="return confirm('Delete this post?')"
+                       style="color:var(--text-secondary);font-size:13px;text-decoration:none;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </a>
+                    {% endif %}
+                </div>
 
-        <!-- Post Image -->
-        <div class="post-image-container">
-            <img src="{{pos.image.url}}" class="post-image" alt="Post by {{pos.user}}">
-        </div>
+                <!-- Image — uniform 1:1 square -->
+                <div class="post-img-wrap">
+                    <img src="{{pos.image.url}}" alt="Post by {{pos.user}}" loading="lazy">
+                </div>
 
-        <!-- Post Actions -->
-        <div class="post-actions">
-            <button class="action-btn like-btn" onclick="toggleLike(this, {{pos.id}})">
-                <i class="far fa-heart"></i>
-            </button>
-            <button class="action-btn">
-                <i class="far fa-comment"></i>
-            </button>
-            <button class="action-btn">
-                <i class="far fa-paper-plane"></i>
-            </button>
-        </div>
+                <!-- Actions -->
+                <div class="post-actions">
+                    <button class="action-btn like-btn" 
+                            onclick="toggleLike(this, '{{pos.id}}')"
+                            data-post-id="{{pos.id}}">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="far fa-comment"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="far fa-paper-plane"></i>
+                    </button>
+                </div>
 
-        <!-- Likes Count -->
-        <div class="likes-count">
-            {% if pos.no_of_likes == 0 %}
-                Be the first to like this
-            {% elif pos.no_of_likes == 1 %}
-                1 like
-            {% else %}
-                {{pos.no_of_likes}} likes
-            {% endif %}
-        </div>
+                <!-- Meta -->
+                <div class="post-meta">
+                    <div class="likes-count" id="likes-{{pos.id}}">
+                        {% if pos.no_of_likes == 0 %}
+                            Be the first to like this
+                        {% elif pos.no_of_likes == 1 %}
+                            1 like
+                        {% else %}
+                            {{pos.no_of_likes}} likes
+                        {% endif %}
+                    </div>
 
-        <!-- Caption -->
-        {% if pos.caption %}
-        <div class="post-caption">
-            <a href="/profile/{{pos.user}}" class="username">{{pos.user}}</a>
-            <span>{{pos.caption}}</span>
-        </div>
+                    {% if pos.caption %}
+                    <div class="post-caption">
+                        <a href="/profile/{{pos.user}}" class="cap-user">{{pos.user}}</a>
+                        {{pos.caption}}
+                    </div>
+                    {% endif %}
+
+                    <div class="post-time">{{pos.created_at|timesince}} ago</div>
+                </div>
+
+            </article>
+            {% endfor %}
+
+        {% else %}
+            <div class="empty-feed">
+                <i class="fa-regular fa-image"></i>
+                <h5>No posts yet</h5>
+                <p>Follow people or create your first post.</p>
+            </div>
         {% endif %}
 
-        <!-- Timestamp -->
-        <div class="post-time">
-            {{pos.created_at|timesince}} ago
-        </div>
-
     </div>
-    {% endfor %}
+</main>
 
-    </div>
-</div>
+<!-- ── Mobile Bottom Tab Bar ────────────────────────────── -->
+<nav class="mobile-tabs">
+    <a href="/" class="active"><i class="fa-solid fa-house"></i></a>
+    <a href="/explore/"><i class="fa-solid fa-compass"></i></a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i></a>
+    <a href="/profile/{{user}}">
+        <img src="{{profile.profileimg.url}}" class="tab-profile-pic" alt="{{user}}">
+    </a>
+</nav>
 
 <script>
-function toggleLike(btn, postId){
+// ── Like toggle with AJAX ───────────────────────────────
+async function toggleLike(btn, postId) {
     const icon = btn.querySelector('i');
-    
-    if(btn.classList.contains("liked")){
-        btn.classList.remove("liked");
-        icon.classList.remove("fas");
-        icon.classList.add("far");
-    }else{
-        btn.classList.add("liked");
-        icon.classList.remove("far");
-        icon.classList.add("fas");
+    const isLiked = btn.classList.contains('liked');
+
+    // Optimistic UI update
+    btn.classList.toggle('liked');
+    icon.classList.toggle('far', isLiked);
+    icon.classList.toggle('fas', !isLiked);
+
+    try {
+        const resp = await fetch(`/like-post/${postId}`, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        // If server responds with redirect (non-JSON), that's fine — 
+        // just keep the optimistic state.
+    } catch(e) {
+        // Revert on network error
+        btn.classList.toggle('liked');
+        icon.classList.toggle('far');
+        icon.classList.toggle('fas');
     }
-    
-    // AJAX call to backend (optional)
-    // fetch('/like/' + postId, {method: 'POST'});
 }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
