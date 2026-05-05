@@ -3,6 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # 🔐 SECURITY
 SECRET_KEY = os.environ.get(
     'SECRET_KEY',
@@ -29,7 +30,7 @@ INSTALLED_APPS = [
 # 🧠 MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ⭐ IMPORTANT for Render
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ⭐ REQUIRED
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -40,6 +41,7 @@ MIDDLEWARE = [
 
 
 ROOT_URLCONF = 'socialmedia.urls'
+
 
 TEMPLATES = [
     {
@@ -57,10 +59,11 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
 
-# 🗄️ DATABASE (SQLite for now)
+# 🗄️ DATABASE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -90,7 +93,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# WhiteNoise support
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
