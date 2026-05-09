@@ -1,691 +1,981 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://kit.fontawesome.com/cb792c0850.js" crossorigin="anonymous"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>@{{user_profile.user}} • Social Hub</title>
 
-  <title>@{{user_profile.user}} • Profile</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://kit.fontawesome.com/cb792c0850.js" crossorigin="anonymous"></script>
 
-  <style>
-    :root {
-      --bg: #fafafa;
-      --surface: #ffffff;
-      --surface2: #f5f5f5;
-      --border: #dbdbdb;
-      --text: #262626;
-      --muted: #8e8e8e;
-      --accent: #0095f6;
-      --accent2: #1877f2;
-      --gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-      --sidebar-w: 260px;
-      --radius: 16px;
+<style>
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+    --sidebar-w: 240px;
+    --bg:        #f5f4f0;
+    --surface:   #ffffff;
+    --border:    #e8e4de;
+    --text:      #1a1a1a;
+    --muted:     #7a7570;
+    --accent:    #e05c2a;
+    --accent2:   #c9406e;
+    --cream:     #f2ede6;
+    --r:         12px;
+    --shadow:    0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+    position: fixed;
+    top:0; left:0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0 20px;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar-logo {
+    padding: 0 24px 28px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+}
+
+.sidebar-profile img {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+}
+
+.sidebar-profile-info strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.sidebar-profile-info span {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.sidebar nav { flex: 1; }
+
+.sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 24px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background .2s, color .2s;
+    position: relative;
+}
+
+.sidebar nav a i {
+    width: 20px;
+    font-size: 18px;
+    color: var(--muted);
+    text-align: center;
+    transition: color .2s;
+}
+
+.sidebar nav a:hover        { background: var(--bg); color: var(--accent); }
+.sidebar nav a:hover i      { color: var(--accent); }
+
+.sidebar nav a.active {
+    font-weight: 600;
+    color: var(--accent);
+    background: linear-gradient(90deg, rgba(224,92,42,.08), transparent);
+}
+
+.sidebar nav a.active::before {
+    content: '';
+    position: absolute;
+    left:0; top:0; bottom:0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    border-radius: 0 2px 2px 0;
+}
+
+.sidebar nav a.active i { color: var(--accent); }
+
+.sidebar-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+}
+
+/* ── Mobile Top Bar ─────────────────────────────────────── */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top:0; left:0; right:0;
+    height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1000;
+}
+
+.mobile-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mobile-top-actions { display: flex; gap: 4px; align-items: center; }
+
+.mobile-top-actions a {
+    color: var(--text);
+    font-size: 18px;
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background .2s;
+}
+
+.mobile-top-actions a:hover { background: var(--bg); }
+
+/* Logout button — mobile top bar */
+.mobile-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: #fef0ed;
+    border: 1px solid #f5c6bc;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s;
+}
+
+.mobile-logout-btn:hover { background: #fde0d8; color: var(--accent); }
+.mobile-logout-btn i     { font-size: 14px; }
+
+/* ── Mobile Bottom Tabs ──────────────────────────────────── */
+.mobile-tabs {
+    display: none;
+    position: fixed;
+    bottom:0; left:0; right:0;
+    height: 60px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1000;
+}
+
+.mobile-tabs a {
+    color: var(--muted);
+    font-size: 22px;
+    text-decoration: none;
+    padding: 8px;
+    transition: color .2s;
+}
+
+.mobile-tabs a.active, .mobile-tabs a:hover { color: var(--accent); }
+
+.tab-profile-pic {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+}
+
+.mobile-tabs a.active .tab-profile-pic { border-color: var(--accent); }
+
+/* ── Main ────────────────────────────────────────────────── */
+.main-content {
+    margin-left: var(--sidebar-w);
+    padding: 32px 24px 48px;
+    min-height: 100vh;
+}
+
+.page-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+/* ── Banner ──────────────────────────────────────────────── */
+.profile-banner {
+    height: 200px;
+    border-radius: var(--r) var(--r) 0 0;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 70%, #533483 100%);
+}
+
+/* Animated gradient orbs */
+.banner-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(48px);
+    opacity: .55;
+    animation: drift 12s ease-in-out infinite;
+}
+
+.banner-orb-1 {
+    width: 220px; height: 220px;
+    background: var(--accent);
+    top: -60px; left: 10%;
+    animation-delay: 0s;
+}
+
+.banner-orb-2 {
+    width: 180px; height: 180px;
+    background: var(--accent2);
+    top: -40px; right: 15%;
+    animation-delay: -4s;
+}
+
+.banner-orb-3 {
+    width: 140px; height: 140px;
+    background: #4f8ef7;
+    bottom: -50px; left: 40%;
+    animation-delay: -8s;
+}
+
+@keyframes drift {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33%      { transform: translate(20px,-15px) scale(1.08); }
+    66%      { transform: translate(-15px,10px) scale(.95); }
+}
+
+/* Dot pattern overlay */
+.banner-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+/* ── Profile Info Box ────────────────────────────────────── */
+.profile-info-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--r) var(--r);
+    padding: 0 32px 32px;
+    box-shadow: var(--shadow);
+}
+
+/* Avatar */
+.avatar-wrap {
+    position: relative;
+    display: inline-block;
+    margin-top: -52px;
+    margin-bottom: 18px;
+}
+
+.avatar-ring {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    z-index: 0;
+}
+
+.avatar-wrap img {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--surface);
+    position: relative;
+    z-index: 1;
+    display: block;
+}
+
+/* Top row */
+.profile-top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.profile-left { flex: 1; min-width: 0; }
+
+.profile-username {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -.3px;
+    margin-bottom: 6px;
+}
+
+.profile-bio {
+    font-size: 14px;
+    color: #3a3a3a;
+    line-height: 1.65;
+    max-width: 400px;
+    margin-bottom: 10px;
+}
+
+.profile-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--cream);
+    padding: 4px 12px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+}
+
+.profile-actions { padding-top: 64px; display: flex; gap: 10px; }
+
+/* Edit button */
+.btn-edit {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 22px;
+    border-radius: var(--r);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+}
+.btn-edit:hover { border-color: var(--text); background: var(--cream); }
+
+/* Follow / Unfollow */
+.btn-follow {
+    padding: 10px 26px;
+    border-radius: var(--r);
+    border: none;
+    background: var(--text);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    transition: transform .15s;
+}
+
+.btn-follow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity .3s;
+}
+
+.btn-follow span { position: relative; z-index: 1; }
+.btn-follow:hover::before { opacity: 1; }
+.btn-follow:hover         { transform: translateY(-1px); }
+
+/* Unfollow style */
+.btn-unfollow {
+    padding: 10px 26px;
+    border-radius: var(--r);
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .2s;
+}
+.btn-unfollow:hover { border-color: #ef4444; color: #ef4444; }
+
+/* ── Stats Row ───────────────────────────────────────────── */
+.stats-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.stat-pill {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 16px 12px;
+    text-align: center;
+    transition: all .2s;
+    cursor: default;
+}
+
+.stat-pill:hover {
+    border-color: var(--accent);
+    background: #fef5f2;
+    transform: translateY(-2px);
+}
+
+.stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    font-weight: 500;
+}
+
+/* ── Posts Section ───────────────────────────────────────── */
+.posts-section {
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-count-badge {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 3px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+/* Grid */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.image-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--bg);
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeUp .4s ease forwards;
+}
+
+@keyframes fadeUp {
+    to { opacity:1; transform:translateY(0); }
+}
+
+.image-item:nth-child(1) { animation-delay: .05s; }
+.image-item:nth-child(2) { animation-delay: .10s; }
+.image-item:nth-child(3) { animation-delay: .15s; }
+.image-item:nth-child(4) { animation-delay: .20s; }
+.image-item:nth-child(5) { animation-delay: .25s; }
+.image-item:nth-child(6) { animation-delay: .30s; }
+
+.image-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .35s ease, filter .3s ease;
+}
+
+.image-item:hover img {
+    transform: scale(1.06);
+    filter: brightness(.75);
+}
+
+/* Overlay */
+.image-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity .25s;
+}
+
+.image-item:hover .image-overlay { opacity: 1; }
+
+.overlay-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 1px 4px rgba(0,0,0,.5);
+}
+
+/* Delete btn */
+.delete-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.15);
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all .2s;
+}
+
+.image-item:hover .delete-btn { display: flex; }
+.delete-btn:hover { background: #ef4444; border-color: #ef4444; color: #fff; }
+
+/* ── Empty State ─────────────────────────────────────────── */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 64px 20px;
+}
+
+.empty-icon {
+    width: 64px; height: 64px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 26px;
+    color: var(--muted);
+}
+
+.empty-state h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.empty-state p { font-size: 13px; color: var(--muted); }
+
+/* ── Edit Profile Modal ──────────────────────────────────── */
+.modal-content {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.18);
+}
+
+.modal-header {
+    border: none;
+    padding: 24px 24px 0;
+}
+
+.modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.modal-body { padding: 20px 24px 24px; }
+
+.modal .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.modal .field-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.modal .field-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(224,92,42,.1);
+    background: var(--surface);
+}
+
+.modal .btn-save {
+    padding: 12px;
+    border-radius: var(--r);
+    border: none;
+    background: var(--text);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: transform .15s;
+}
+
+.modal .btn-save::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity .3s;
+}
+
+.modal .btn-save:hover::before { opacity: 1; }
+.modal .btn-save:hover         { transform: translateY(-1px); }
+.modal .btn-save span          { position: relative; z-index: 1; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+    :root { --sidebar-w: 200px; }
+    .sidebar-logo { font-size: 19px; }
+    .sidebar-profile-info { display: none; }
+}
+
+@media (max-width: 680px) {
+    .sidebar     { display: none; }
+    .mobile-nav  { display: flex; }
+    .mobile-tabs { display: flex; }
+
+    .main-content {
+        margin-left: 0;
+        padding: 68px 12px 72px;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-    }
-
-    /* ─── SIDEBAR ─── */
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: var(--sidebar-w);
-      height: 100vh;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 28px 0 24px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-
-    .sidebar-logo {
-      padding: 0 28px 28px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      letter-spacing: -0.5px;
-      background: var(--gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .sidebar-user {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 28px;
-      margin: 0 16px 16px;
-      background: var(--surface2);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-    }
-
-    .sidebar-user img {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid transparent;
-      background: var(--gradient) border-box;
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    .sidebar-user .user-meta { flex: 1; overflow: hidden; }
-    .sidebar-user .user-name {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .sidebar-user .user-handle {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .nav-section { padding: 0 16px; flex: 1; }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 13px 16px;
-      border-radius: 12px;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      margin-bottom: 4px;
-    }
-
-    .nav-link i { font-size: 18px; width: 20px; text-align: center; }
-
-    .nav-link:hover {
-      background: var(--surface2);
-      color: var(--text);
-    }
-
-    .nav-link.active {
-      background: #f0f0f0;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .nav-link.active i { color: var(--accent); }
-
-    .sidebar-bottom {
-      padding: 0 16px;
-      margin-top: auto;
-    }
-
-    /* ─── MAIN ─── */
-    .main {
-      margin-left: var(--sidebar-w);
-      padding: 40px 32px;
-      min-height: 100vh;
-    }
-
-    /* ─── PROFILE CARD ─── */
-    .profile-card {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    /* Hero Banner */
-    .profile-banner {
-      height: 180px;
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 30%, #ffeaa7 60%, #dfe9f3 100%);
-      border-radius: var(--radius) var(--radius) 0 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .profile-banner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 20% 50%, rgba(240,148,51,0.25) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 30%, rgba(188,24,136,0.15) 0%, transparent 50%);
-    }
-
-    .profile-banner::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
-      background-size: 28px 28px;
-    }
-
-    /* Profile Info Box */
-    .profile-info-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 var(--radius) var(--radius);
-      padding: 0 36px 36px;
-    }
-
-    /* Avatar */
-    .avatar-wrap {
-      position: relative;
-      display: inline-block;
-      margin-top: -56px;
-      margin-bottom: 20px;
-    }
-
-    .avatar-wrap img {
-      width: 112px;
-      height: 112px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid var(--surface);
-      display: block;
-    }
-
-    .avatar-ring {
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      background: var(--gradient);
-      z-index: -1;
-    }
-
-    /* Profile Top Row */
-    .profile-top-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .profile-left { flex: 1; min-width: 0; }
-
-    .profile-username {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 26px;
-      color: var(--text);
-      margin-bottom: 6px;
-      letter-spacing: -0.5px;
-    }
-
-    .profile-bio {
-      font-size: 14px;
-      color: #262626;
-      line-height: 1.6;
-      max-width: 420px;
-      margin-bottom: 10px;
-    }
-
-    .profile-location {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--muted);
-      background: var(--surface2);
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-    }
-
-    /* Buttons */
-    .btn-edit {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 24px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .btn-edit:hover {
-      border-color: #c0c0c0;
-      background: #e0e0e0;
-    }
-
-    .btn-follow {
-      background: #0095f6;
-      border: none;
-      color: #fff;
-      padding: 10px 28px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .btn-follow:hover {
-      opacity: 0.85;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(0,149,246,0.35);
-    }
-
-    /* Stats Row */
-    .stats-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 28px;
-    }
-
-    .stat-pill {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 24px;
-      text-align: center;
-      flex: 1;
-      transition: all 0.2s;
-      cursor: default;
-    }
-
-    .stat-pill:hover {
-      border-color: #c0c0c0;
-      background: #efefef;
-      transform: translateY(-2px);
-    }
-
-    .stat-num {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      color: var(--text);
-      display: block;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .stat-lbl {
-      font-size: 12px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-
-    /* ─── POSTS SECTION ─── */
-    .posts-section {
-      max-width: 900px;
-      margin: 20px auto 0;
-    }
-
-    .section-tabs {
-      display: flex;
-      gap: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 6px;
-      margin-bottom: 20px;
-      width: fit-content;
-    }
-
-    .tab-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 22px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--muted);
-      background: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.3px;
-    }
-
-    .tab-btn.active {
-      background: #262626;
-      color: #fff;
-    }
-
-    .tab-btn:not(.active):hover {
-      background: var(--surface2);
-      color: var(--text);
-    }
-
-    /* Grid */
-    .image-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .image-item {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      background: var(--surface2);
-      animation: fadeUp 0.4s ease both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .image-item:nth-child(1) { animation-delay: 0.05s; }
-    .image-item:nth-child(2) { animation-delay: 0.10s; }
-    .image-item:nth-child(3) { animation-delay: 0.15s; }
-    .image-item:nth-child(4) { animation-delay: 0.20s; }
-    .image-item:nth-child(5) { animation-delay: 0.25s; }
-    .image-item:nth-child(6) { animation-delay: 0.30s; }
-
-    .image-item img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform 0.35s ease;
-      display: block;
-    }
-
-    .image-item:hover img { transform: scale(1.06); }
-
-    .image-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to top,
-        rgba(0,0,0,0.75) 0%,
-        rgba(0,0,0,0.1) 60%,
-        transparent 100%
-      );
-      display: flex;
-      align-items: flex-end;
-      padding: 14px;
-      gap: 16px;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-
-    .image-item:hover .image-overlay { opacity: 1; }
-
-    .overlay-stat {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .overlay-stat i { font-size: 13px; }
-
-    /* Delete */
-    .delete-btn {
-      position: absolute;
-      top: 10px; right: 10px;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(6px);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px;
-      width: 32px; height: 32px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      font-size: 13px;
-      transition: all 0.2s;
-    }
-
-    .image-item:hover .delete-btn { display: flex; }
-
-    .delete-btn:hover {
-      background: #fc5c7d;
-      border-color: #fc5c7d;
-      transform: scale(1.08);
-    }
-
-    /* Empty State */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 80px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-    }
-
-    .empty-icon {
-      width: 72px; height: 72px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 28px;
-      color: var(--muted);
-    }
-
-    .empty-state h3 {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 22px;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    .empty-state p { font-size: 14px; color: var(--muted); }
-
-    /* ─── MOBILE NAV ─── */
-    .mobile-nav {
-      display: none;
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #ffffff;
-      border-top: 1px solid var(--border);
-      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-      z-index: 1000;
-    }
-
-    .mobile-nav-inner {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-
-    .mobile-nav a {
-      color: var(--muted);
-      font-size: 20px;
-      padding: 8px 14px;
-      border-radius: 10px;
-      transition: all 0.2s;
-      text-decoration: none;
-    }
-
-    .mobile-nav a.active { color: var(--accent); }
-    .mobile-nav a:hover { color: var(--text); }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 900px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; padding: 20px 16px 90px; }
-      .mobile-nav { display: block; }
-    }
-
-    @media (max-width: 600px) {
-      .profile-info-box { padding: 0 20px 28px; }
-      .profile-top-row { flex-direction: column; gap: 14px; }
-      .stats-row { gap: 6px; }
-      .stat-pill { padding: 12px 10px; }
-      .stat-num { font-size: 18px; }
-      .image-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
-      .image-item { border-radius: 6px; }
-      .profile-banner { height: 130px; }
-      .avatar-wrap img { width: 88px; height: 88px; }
-      .profile-username { font-size: 21px; }
-    }
-  </style>
+    .profile-banner  { height: 140px; }
+    .avatar-wrap img { width: 80px; height: 80px; }
+    .avatar-wrap     { margin-top: -40px; }
+    .profile-info-box { padding: 0 16px 20px; }
+
+    .profile-top-row  { flex-direction: column; gap: 12px; }
+    .profile-actions  { padding-top: 0; }
+    .profile-username { font-size: 24px; }
+
+    .stats-row { gap: 6px; }
+    .stat-num  { font-size: 22px; }
+
+    .image-grid { gap: 4px; }
+    .image-item { border-radius: 6px; }
+
+    .posts-section { padding: 16px; }
+}
+
+@media (max-width: 400px) {
+    .image-grid { gap: 3px; }
+    .stat-pill  { padding: 12px 8px; }
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+.sidebar::-webkit-scrollbar       { width: 5px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
 </head>
-
 <body>
 
-  <!-- ─── SIDEBAR ─── -->
-  <nav class="sidebar">
-    <div class="sidebar-logo">SOCIAL HUB</div>
+<!-- ── Desktop Sidebar ───────────────────────────────────── -->
+<aside class="sidebar">
+    <div class="sidebar-logo">Social Hub</div>
 
-    <div class="sidebar-user">
-      <img src="{{profile.profileimg.url}}" alt="profile" />
-      <div class="user-meta">
-        <div class="user-name">@{{user}}</div>
-        <div class="user-handle">Your profile</div>
-      </div>
-    </div>
-
-    <div class="nav-section">
-      <a href="/" class="nav-link"><i class="fa fa-home"></i> Home</a>
-      <a href="/explore" class="nav-link"><i class="fa fa-compass"></i> Explore</a>
-      <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#exampleModal3"><i class="fa fa-search"></i> Search</a>
-      <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa fa-plus-square"></i> Create</a>
-      <a href="/profile/{{user}}" class="nav-link active"><i class="fa fa-user-circle"></i> Profile</a>
-    </div>
-
-    <div class="sidebar-bottom">
-      <a href="/logoutt" class="nav-link"><i class="fa fa-sign-out-alt"></i> Logout</a>
-    </div>
-  </nav>
-
-  <!-- ─── MAIN ─── -->
-  <main class="main">
-
-    {% include "search.html" %}
-    {% include "profile_upload.html" %}
-    {% include "edit_profile.html" %}
-
-    <!-- Profile Card -->
-    <div class="profile-card">
-      <div class="profile-banner"></div>
-
-      <div class="profile-info-box">
-        <div class="profile-top-row">
-          <div class="profile-left">
-            <div class="avatar-wrap">
-              <div class="avatar-ring"></div>
-              <img src="{{user_profile.profileimg.url}}" alt="{{user_profile.user}}" />
-            </div>
-            <h1 class="profile-username">{{user_profile.user}}</h1>
-            <p class="profile-bio">{{user_profile.bio}}</p>
-            {% if user_profile.location %}
-            <span class="profile-location">
-              <i class="fa fa-map-marker-alt"></i> {{user_profile.location}}
-            </span>
-            {% endif %}
-          </div>
-
-          <div style="padding-top: 80px;">
-            {% if user == user_profile.user %}
-            <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#exampleModal1">
-              <i class="fa fa-pen" style="margin-right:6px; font-size:12px;"></i> Edit Profile
-            </button>
-            {% else %}
-            <form action="/follow" method="POST" style="margin:0">
-              {% csrf_token %}
-              <input type="hidden" value="{{user.username}}" name="follower" />
-              <input type="hidden" value="{{user_object.username}}" name="user" />
-              <button type="submit" class="btn-follow">{{follow_unfollow}}</button>
-            </form>
-            {% endif %}
-          </div>
+    <div class="sidebar-profile">
+        <img src="{{profile.profileimg.url}}" alt="{{user}}">
+        <div class="sidebar-profile-info">
+            <strong>{{user}}</strong>
+            <span>My Profile</span>
         </div>
-
-        <div class="stats-row">
-          <div class="stat-pill">
-            <span class="stat-num">{{user_post_length}}</span>
-            <span class="stat-lbl">Posts</span>
-          </div>
-          <div class="stat-pill">
-            <span class="stat-num">{{user_followers}}</span>
-            <span class="stat-lbl">Followers</span>
-          </div>
-          <div class="stat-pill">
-            <span class="stat-num">{{user_following}}</span>
-            <span class="stat-lbl">Following</span>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Posts -->
-    <div class="posts-section">
-      <div class="section-tabs">
-        <button class="tab-btn active"><i class="fa fa-th"></i> Posts</button>
-      </div>
+    <nav>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/explore/"><i class="fa-solid fa-compass"></i> Explore</a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i> Create</a>
+        <a href="/profile/{{user}}" class="active"><i class="fa-solid fa-circle-user"></i> Profile</a>
 
-      <div class="image-grid">
-        {% if user_posts %}
-          {% for pos in user_posts %}
-          <div class="image-item">
-            <img src="{{pos.image.url}}" alt="{{pos.caption}}" />
+        <div class="sidebar-footer">
+            <a href="/logoutt/"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </nav>
+</aside>
 
-            <div class="image-overlay">
-              <div class="overlay-stat"><i class="fa fa-heart"></i> {{pos.no_of_likes}}</div>
-              <div class="overlay-stat"><i class="fa fa-comment"></i> 0</div>
-            </div>
-
-            {% if user == user_profile.user %}
-            <a href="/delete/{{pos.id}}" class="delete-btn" onclick="return confirm('Delete this post?')">
-              <i class="fa fa-trash"></i>
-            </a>
-            {% endif %}
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="empty-state">
-            <div class="empty-icon"><i class="fa fa-camera"></i></div>
-            <h3>No Posts Yet</h3>
-            <p>When you share photos, they'll appear on your profile.</p>
-          </div>
+<!-- ── Mobile Top Bar ────────────────────────────────────── -->
+<header class="mobile-nav">
+    <span class="mobile-logo">@{{user_profile.user}}</span>
+    <div class="mobile-top-actions">
+        {% if user == user_profile.user %}
+        <a href="#" data-bs-toggle="modal" data-bs-target="#editProfileModal"
+           title="Edit Profile" style="color:var(--muted);font-size:17px;">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
         {% endif %}
-      </div>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"
+           title="Create Post">
+            <i class="fa-solid fa-square-plus"></i>
+        </a>
+        <!-- Logout — always visible on mobile top bar -->
+        <a href="/logoutt/" class="mobile-logout-btn" title="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
     </div>
+</header>
 
-  </main>
+<!-- ── Main ─────────────────────────────────────────────── -->
+<main class="main-content">
 
-  <!-- ─── MOBILE NAV ─── -->
-  <nav class="mobile-nav">
-    <div class="mobile-nav-inner">
-      <a href="/"><i class="fa fa-home"></i></a>
-      <a href="/explore"><i class="fa fa-compass"></i></a>
-      <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal2"><i class="fa fa-plus-square"></i></a>
-      <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal3"><i class="fa fa-search"></i></a>
-      <a href="/profile/{{user}}" class="active"><i class="fa fa-user-circle"></i></a>
+    {% include "modal.html" %}
+    {% include "search.html" %}
+
+    <div class="page-wrap">
+
+        <!-- Profile Card -->
+        <div>
+            <!-- Banner -->
+            <div class="profile-banner">
+                <div class="banner-orb banner-orb-1"></div>
+                <div class="banner-orb banner-orb-2"></div>
+                <div class="banner-orb banner-orb-3"></div>
+                <div class="banner-dots"></div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="profile-info-box">
+                <div class="profile-top-row">
+                    <div class="profile-left">
+                        <div class="avatar-wrap">
+                            <div class="avatar-ring"></div>
+                            <img src="{{user_profile.profileimg.url}}" alt="{{user_profile.user}}">
+                        </div>
+                        <h1 class="profile-username">{{user_profile.user}}</h1>
+                        {% if user_profile.bio %}
+                        <p class="profile-bio">{{user_profile.bio}}</p>
+                        {% endif %}
+                        {% if user_profile.location %}
+                        <span class="profile-location">
+                            <i class="fa-solid fa-location-dot"></i> {{user_profile.location}}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-actions">
+                        {% if user == user_profile.user %}
+                        <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <i class="fa-solid fa-pen" style="font-size:12px;"></i> Edit Profile
+                        </button>
+                        {% else %}
+                        <form action="/follow/" method="POST" style="margin:0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="follower" value="{{user.username}}">
+                            <input type="hidden" name="user"     value="{{user_object.username}}">
+                            {% if follow_unfollow == 'Unfollow' %}
+                            <button type="submit" class="btn-unfollow">Unfollow</button>
+                            {% else %}
+                            <button type="submit" class="btn-follow"><span>Follow</span></button>
+                            {% endif %}
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-pill">
+                        <span class="stat-num">{{user_post_length}}</span>
+                        <span class="stat-lbl">Posts</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-num">{{user_followers}}</span>
+                        <span class="stat-lbl">Followers</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-num">{{user_following}}</span>
+                        <span class="stat-lbl">Following</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Posts Grid -->
+        <div class="posts-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fa-solid fa-grid-2" style="font-size:16px;color:var(--accent);"></i>
+                    Posts
+                    <span class="post-count-badge">{{user_post_length}}</span>
+                </div>
+            </div>
+
+            <div class="image-grid">
+                {% if user_posts %}
+                    {% for pos in user_posts %}
+                    <div class="image-item">
+                        <img src="{{pos.image.url}}" alt="{{pos.caption}}" loading="lazy">
+
+                        <div class="image-overlay">
+                            <div class="overlay-stat">
+                                <i class="fa-solid fa-heart"></i> {{pos.no_of_likes}}
+                            </div>
+                        </div>
+
+                        {% if user == user_profile.user %}
+                        <a href="/delete/{{pos.id}}/"
+                           class="delete-btn"
+                           onclick="return confirm('Delete this post?')"
+                           title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fa-regular fa-image"></i></div>
+                        <h3>No Posts Yet</h3>
+                        <p>Share your first photo to get started.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
     </div>
-  </nav>
+</main>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- ── Mobile Bottom Tabs ─────────────────────────────────── -->
+<nav class="mobile-tabs">
+    <a href="/"><i class="fa-solid fa-house"></i></a>
+    <a href="/explore/"><i class="fa-solid fa-compass"></i></a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i></a>
+    <a href="/profile/{{user}}" class="active">
+        <img src="{{profile.profileimg.url}}" class="tab-profile-pic" alt="{{user}}">
+    </a>
+</nav>
 
+<!-- ── Edit Profile Modal ─────────────────────────────────── -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data" action="/profile/{{user_profile.user}}/">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="field-label">Profile Photo</label>
+                        <input type="file" name="image" accept="image/*" class="field-input">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="field-label">Bio</label>
+                        <textarea name="bio" class="field-input" rows="3"
+                                  placeholder="Tell people about yourself…"
+                                  style="resize:none;">{{user_profile.bio}}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="field-label">Location</label>
+                        <input type="text" name="location" class="field-input"
+                               placeholder="Mumbai, India"
+                               value="{{user_profile.location}}">
+                    </div>
+
+                    <button type="submit" class="btn-save">
+                        <span>Save Changes</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
