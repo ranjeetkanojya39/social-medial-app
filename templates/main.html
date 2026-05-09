@@ -265,25 +265,24 @@ body {
 }
 .post-username:hover { text-decoration: underline; color: var(--accent); }
 
-/* ── UNIFORM IMAGE ─────────────────────────────────────── */
-/* Every post image is exactly 1:1 square, object-fit cover = no whitespace */
+/* ── IMAGE — full visible, no black bars, no crop ──────── */
 .post-img-wrap {
     width: 100%;
-    aspect-ratio: 1 / 1;   /* perfect square every time */
-    background: #f0eeea;
+    background: var(--bg);
     overflow: hidden;
 }
 
 .post-img-wrap img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;      /* crops to fill — no black bars */
+    height: auto;             /* natural height — no black bars, no crop */
+    max-height: 600px;        /* cap very tall images */
+    object-fit: cover;
     display: block;
     transition: transform .35s ease;
 }
 
 .post-card:hover .post-img-wrap img {
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 
 /* Post Actions */
@@ -456,7 +455,7 @@ body {
                 <!-- Header -->
                 <div class="post-header">
                     <div class="post-header-left">
-                        <img src="{{profile.profileimg.url}}" class="post-avatar" alt="{{pos.user}}">
+                        <img src="{{pos.author_avatar}}" class="post-avatar" alt="{{pos.user}}">
                         <a href="/profile/{{pos.user}}" class="post-username">{{pos.user}}</a>
                     </div>
 

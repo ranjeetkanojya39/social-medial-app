@@ -81,7 +81,24 @@ def home(request):
         Q(user=request.user.username) | Q(user__in=following_users)
     ).order_by('-created_at')
 
-    return render(request, 'main.html', {'post': posts, 'profile': profile})
+    # Build username->profile map so each post shows the correct author avatar
+    post_usernames  = set(p.user for p in posts)
+    author_profiles = {
+        ap.user.username: ap
+        for ap in Profile.objects.filter(
+            user__username__in=post_usernames
+        ).select_related('user')
+    }
+
+    # Attach each post's author avatar URL directly on the post object
+    for p in posts:
+        author = author_profiles.get(p.user)
+        p.author_avatar = author.profileimg.url if author else profile.profileimg.url
+
+    return render(request, 'main.html', {
+        'post':    posts,
+        'profile': profile,
+    })
 
 
 # ---------------------------------------------------------------------------
