@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get(
     'django-insecure-default-key-change-this'
 )
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'   
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -27,6 +27,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # ✅ CLOUDINARY — ADD KARO (order important hai)
+    'cloudinary',
+    'cloudinary_storage',
+
     'userauth',
 ]
 
@@ -34,7 +39,7 @@ INSTALLED_APPS = [
 # 🧠 MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ MUST for Render
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,7 +73,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
 
-# 🗄️ DATABASE (SQLite for Render free)
+# 🗄️ DATABASE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -97,13 +102,23 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-# 🖼️ MEDIA FILES
-MEDIA_URL = '/media/'
+# 🖼️ MEDIA FILES — LOCAL (sirf local dev ke liye)
+MEDIA_URL  = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# ✅ CLOUDINARY CONFIG — Render pe images yahan save hongi
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY':    os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+# ✅ Yeh line sabse zaroori hai — sab ImageField uploads Cloudinary pe jayenge
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 # 🔑 DEFAULT AUTO FIELD
