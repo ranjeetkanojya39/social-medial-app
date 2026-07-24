@@ -1,5 +1,6 @@
 {% load static %}
 
+<<<<<<< HEAD
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -35,3 +36,569 @@
         </div>
     </div>
 </div>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Hub</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/cb792c0850.js" crossorigin="anonymous"></script>
+
+<style>
+/* ── Reset & Base ──────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+    --sidebar-w: 240px;
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e8e4de;
+    --text-primary: #1a1a1a;
+    --text-secondary: #7a7570;
+    --accent: #e05c2a;
+    --accent2: #c9406e;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+    --transition: .2s ease;
+}
+
+body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* ── Sidebar ───────────────────────────────────────────── */
+.sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0 20px;
+    z-index: 1000;
+    overflow-y: auto;
+    transition: transform var(--transition);
+}
+
+.sidebar-logo {
+    padding: 0 24px 28px;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -.3px;
+}
+
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+}
+
+.sidebar-profile img {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+}
+
+.sidebar-profile-info strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.sidebar-profile-info span {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 24px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 0;
+    transition: background var(--transition), color var(--transition);
+    position: relative;
+}
+
+.sidebar nav a i {
+    width: 20px;
+    font-size: 18px;
+    color: var(--text-secondary);
+    transition: color var(--transition);
+    text-align: center;
+}
+
+.sidebar nav a:hover {
+    background: var(--bg);
+    color: var(--accent);
+}
+
+.sidebar nav a:hover i { color: var(--accent); }
+
+.sidebar nav a.active {
+    font-weight: 600;
+    color: var(--accent);
+    background: linear-gradient(90deg, rgba(224,92,42,.08) 0%, transparent 100%);
+}
+
+.sidebar nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2));
+    border-radius: 0 2px 2px 0;
+}
+
+.sidebar nav a.active i { color: var(--accent); }
+
+.sidebar-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+}
+
+/* ── Mobile Top Nav ────────────────────────────────────── */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1000;
+}
+
+.mobile-nav .mobile-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mobile-nav-icons { display: flex; gap: 20px; }
+.mobile-nav-icons a { color: var(--text-primary); font-size: 20px; text-decoration: none; }
+
+/* Mobile Bottom Tab Bar */
+.mobile-tabs {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1000;
+}
+
+.mobile-tabs a {
+    color: var(--text-secondary);
+    font-size: 22px;
+    text-decoration: none;
+    padding: 8px;
+    transition: color var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mobile-tabs a.active,
+.mobile-tabs a:hover { color: var(--accent); }
+
+.mobile-tabs .tab-profile-pic {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+}
+
+.mobile-tabs a.active .tab-profile-pic {
+    border-color: var(--accent);
+}
+
+/* ── Main Content ──────────────────────────────────────── */
+.main-content {
+    margin-left: var(--sidebar-w);
+    padding: 32px 16px;
+    min-height: 100vh;
+}
+
+.feed-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ── Post Card ─────────────────────────────────────────── */
+.post-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: box-shadow var(--transition);
+}
+
+.post-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,.09), 0 8px 24px rgba(0,0,0,.06);
+}
+
+/* Post Header */
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+}
+
+.post-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.post-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+}
+
+.post-username {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+.post-username:hover { text-decoration: underline; color: var(--accent); }
+
+/* ── IMAGE — full visible, no black bars, no crop ──────── */
+.post-img-wrap {
+    width: 100%;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+.post-img-wrap img {
+    width: 100%;
+    height: auto;             /* natural height — no black bars, no crop */
+    max-height: 600px;        /* cap very tall images */
+    object-fit: cover;
+    display: block;
+    transition: transform .35s ease;
+}
+
+.post-card:hover .post-img-wrap img {
+    transform: scale(1.01);
+}
+
+/* Post Actions */
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 10px 4px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 6px 8px;
+    color: var(--text-primary);
+    transition: color var(--transition), transform .15s ease;
+    border-radius: 8px;
+    line-height: 1;
+}
+
+.action-btn:hover { background: var(--bg); }
+.action-btn:active { transform: scale(.9); }
+
+.like-btn.liked { color: #ed4956; }
+
+.like-btn.liked i { animation: heartPop .3s ease; }
+
+@keyframes heartPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    70%  { transform: scale(.9); }
+    100% { transform: scale(1); }
+}
+
+/* Likes + Caption + Time */
+.post-meta {
+    padding: 2px 14px 14px;
+}
+
+.likes-count {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-primary);
+}
+
+.post-caption {
+    font-size: 13.5px;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+    line-height: 1.5;
+}
+
+.post-caption .cap-user {
+    font-weight: 600;
+    margin-right: 5px;
+    text-decoration: none;
+    color: var(--text-primary);
+}
+.post-caption .cap-user:hover { color: var(--accent); }
+
+.post-time {
+    font-size: 10px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+/* ── Empty Feed ────────────────────────────────────────── */
+.empty-feed {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-feed i { font-size: 52px; opacity: .25; margin-bottom: 16px; display: block; }
+.empty-feed h5 { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+.sidebar::-webkit-scrollbar { width: 5px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 900px) {
+    :root { --sidebar-w: 200px; }
+    .sidebar-logo { font-size: 20px; }
+    .sidebar nav a { font-size: 13px; padding: 10px 18px; }
+    .sidebar-profile-info { display: none; }
+}
+
+@media (max-width: 680px) {
+    .sidebar { display: none; }
+
+    .mobile-nav  { display: flex; }
+    .mobile-tabs { display: flex; }
+
+    .main-content {
+        margin-left: 0;
+        padding: 68px 0 72px;   /* top = mobile nav h, bottom = tab bar h */
+    }
+
+    .feed-wrap {
+        max-width: 100%;
+        padding: 0 12px;
+    }
+
+    .post-card {
+        border-radius: 10px;
+    }
+}
+
+@media (max-width: 400px) {
+    .feed-wrap { padding: 0 6px; }
+    .post-card { border-radius: 8px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ── Desktop Sidebar ──────────────────────────────────── -->
+<aside class="sidebar">
+    <div class="sidebar-logo">Social Hub</div>
+
+    <div class="sidebar-profile">
+        <img src="{{profile.profileimg.url}}" alt="{{user}}">
+        <div class="sidebar-profile-info">
+            <strong>{{user}}</strong>
+            <span>My Profile</span>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/" class="active"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="/explore/"><i class="fa-solid fa-compass"></i> Explore</a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i> Create</a>
+        <a href="/profile/{{user}}"><i class="fa-solid fa-circle-user"></i> Profile</a>
+
+        <div class="sidebar-footer">
+            <a href="/logoutt/"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+    </nav>
+</aside>
+
+<!-- ── Mobile Top Bar ───────────────────────────────────── -->
+<header class="mobile-nav">
+    <span class="mobile-logo">Social Hub</span>
+    <div class="mobile-nav-icons">
+        <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i></a>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa-solid fa-magnifying-glass"></i></a>
+    </div>
+</header>
+
+<!-- ── Feed ─────────────────────────────────────────────── -->
+<main class="main-content">
+    <div class="feed-wrap">
+
+        {% include "modal.html" %}
+        {% include "search.html" %}
+
+        {% if post %}
+            {% for pos in post %}
+            <article class="post-card">
+
+                <!-- Header -->
+                <div class="post-header">
+                    <div class="post-header-left">
+                        <img src="{{pos.author_avatar}}" class="post-avatar" alt="{{pos.user}}">
+                        <a href="/profile/{{pos.user}}" class="post-username">{{pos.user}}</a>
+                    </div>
+
+                    {% if pos.user == user.username %}
+                    <a href="/delete/{{pos.id}}"
+                       onclick="return confirm('Delete this post?')"
+                       style="color:var(--text-secondary);font-size:13px;text-decoration:none;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Image — uniform 1:1 square -->
+                <div class="post-img-wrap">
+                    <img src="{{pos.image.url}}" alt="Post by {{pos.user}}" loading="lazy">
+                </div>
+
+                <!-- Actions -->
+                <div class="post-actions">
+                    <button class="action-btn like-btn" 
+                            onclick="toggleLike(this, '{{pos.id}}')"
+                            data-post-id="{{pos.id}}">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="far fa-comment"></i>
+                    </button>
+                    <button class="action-btn">
+                        <i class="far fa-paper-plane"></i>
+                    </button>
+                </div>
+
+                <!-- Meta -->
+                <div class="post-meta">
+                    <div class="likes-count" id="likes-{{pos.id}}">
+                        {% if pos.no_of_likes == 0 %}
+                            Be the first to like this
+                        {% elif pos.no_of_likes == 1 %}
+                            1 like
+                        {% else %}
+                            {{pos.no_of_likes}} likes
+                        {% endif %}
+                    </div>
+
+                    {% if pos.caption %}
+                    <div class="post-caption">
+                        <a href="/profile/{{pos.user}}" class="cap-user">{{pos.user}}</a>
+                        {{pos.caption}}
+                    </div>
+                    {% endif %}
+
+                    <div class="post-time">{{pos.created_at|timesince}} ago</div>
+                </div>
+
+            </article>
+            {% endfor %}
+
+        {% else %}
+            <div class="empty-feed">
+                <i class="fa-regular fa-image"></i>
+                <h5>No posts yet</h5>
+                <p>Follow people or create your first post.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</main>
+
+<!-- ── Mobile Bottom Tab Bar ────────────────────────────── -->
+<nav class="mobile-tabs">
+    <a href="/" class="active"><i class="fa-solid fa-house"></i></a>
+    <a href="/explore/"><i class="fa-solid fa-compass"></i></a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fa-solid fa-square-plus"></i></a>
+    <a href="/profile/{{user}}">
+        <img src="{{profile.profileimg.url}}" class="tab-profile-pic" alt="{{user}}">
+    </a>
+</nav>
+
+<script>
+// ── Like toggle with AJAX ───────────────────────────────
+async function toggleLike(btn, postId) {
+    const icon = btn.querySelector('i');
+    const isLiked = btn.classList.contains('liked');
+
+    // Optimistic UI update
+    btn.classList.toggle('liked');
+    icon.classList.toggle('far', isLiked);
+    icon.classList.toggle('fas', !isLiked);
+
+    try {
+        const resp = await fetch(`/like-post/${postId}`, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        // If server responds with redirect (non-JSON), that's fine — 
+        // just keep the optimistic state.
+    } catch(e) {
+        // Revert on network error
+        btn.classList.toggle('liked');
+        icon.classList.toggle('far');
+        icon.classList.toggle('fas');
+    }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+>>>>>>> 8e6df7d041b0b59b7b10caede3184c4b06cee6ff

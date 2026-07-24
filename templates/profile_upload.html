@@ -1,0 +1,355 @@
+{% load static %}
+
+<style>
+/* 🔥 Modern Modal Styling */
+.modal-content{
+    border-radius:16px;
+    border:none;
+    box-shadow:0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header{
+    border-bottom:1px solid #efefef;
+    padding:16px 20px;
+}
+
+.modal-title{
+    font-size:16px;
+    font-weight:600;
+    color:#262626;
+    width:100%;
+    text-align:center;
+}
+
+.modal-header .btn-close{
+    position:absolute;
+    right:15px;
+    top:15px;
+}
+
+.modal-body{
+    padding:20px;
+}
+
+/* Image Preview Container */
+.image-preview-container{
+    width:100%;
+    max-height:400px;
+    background:#fafafa;
+    border:2px dashed #dbdbdb;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    margin-bottom:20px;
+    position:relative;
+    cursor:pointer;
+    transition:all 0.3s ease;
+}
+
+.image-preview-container:hover{
+    border-color:#0095f6;
+    background:#f0f8ff;
+}
+
+.image-preview-container.has-image{
+    border:none;
+    background:#000;
+}
+
+.upload-placeholder{
+    text-align:center;
+    padding:40px 20px;
+}
+
+.upload-placeholder i{
+    font-size:48px;
+    color:#8e8e8e;
+    margin-bottom:15px;
+}
+
+.upload-placeholder h5{
+    color:#262626;
+    font-size:18px;
+    font-weight:300;
+    margin-bottom:8px;
+}
+
+.upload-placeholder p{
+    color:#8e8e8e;
+    font-size:14px;
+    margin:0;
+}
+
+#imagePreview{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:none;
+}
+
+#imagePreview.show{
+    display:block;
+}
+
+/* File Input Hidden */
+#image_upload{
+    display:none;
+}
+
+/* Caption Textarea */
+.caption-container{
+    margin-bottom:15px;
+}
+
+.caption-container label{
+    font-size:14px;
+    font-weight:600;
+    color:#262626;
+    margin-bottom:8px;
+}
+
+.caption-container textarea{
+    border:1px solid #dbdbdb;
+    border-radius:8px;
+    padding:12px;
+    font-size:14px;
+    resize:none;
+    transition:all 0.3s ease;
+}
+
+.caption-container textarea:focus{
+    border-color:#0095f6;
+    box-shadow:0 0 0 1px #0095f6;
+    outline:none;
+}
+
+/* Footer Buttons */
+.modal-footer{
+    border-top:1px solid #efefef;
+    padding:12px 20px;
+}
+
+.modal-footer .btn{
+    border-radius:8px;
+    padding:8px 24px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.modal-footer .btn-secondary{
+    background:#efefef;
+    border:none;
+    color:#262626;
+}
+
+.modal-footer .btn-secondary:hover{
+    background:#dbdbdb;
+}
+
+.modal-footer .btn-primary{
+    background:#0095f6;
+    border:none;
+}
+
+.modal-footer .btn-primary:hover{
+    background:#1877f2;
+}
+
+.modal-footer .btn-primary:disabled{
+    background:#b3d9ff;
+    cursor:not-allowed;
+}
+
+/* Remove Image Button */
+.remove-image-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:rgba(0,0,0,0.7);
+    color:white;
+    border:none;
+    border-radius:50%;
+    width:32px;
+    height:32px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:10;
+    transition:all 0.3s ease;
+}
+
+.remove-image-btn:hover{
+    background:rgba(0,0,0,0.9);
+    transform:scale(1.1);
+}
+
+.remove-image-btn.show{
+    display:flex;
+}
+
+/* Character Counter */
+.char-counter{
+    text-align:right;
+    font-size:12px;
+    color:#8e8e8e;
+    margin-top:5px;
+}
+</style>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h1 class="modal-title" id="exampleModalLabel">Create New Post</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+
+                <div class="modal-body">
+
+                    <!-- Image Upload Area -->
+                    <div class="image-preview-container" id="imageContainer" onclick="document.getElementById('image_upload').click()">
+                        
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h5>Select photo to upload</h5>
+                            <p>or drag and drop</p>
+                        </div>
+
+                        <img id="imagePreview" alt="Preview">
+
+                        <button type="button" class="remove-image-btn" id="removeImageBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+
+                    </div>
+
+                    <input type="file" name="image_upload" class="form-control" id="image_upload" accept="image/*" required>
+
+                    <!-- Caption -->
+                    <div class="caption-container">
+                        <label for="caption">Write a caption</label>
+                        <textarea class="form-control" name="caption" placeholder="Share what's on your mind..." id="caption" rows="4" maxlength="2200"></textarea>
+                        <div class="char-counter">
+                            <span id="charCount">0</span>/2200
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Share</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// Image Preview Logic
+const imageInput = document.getElementById('image_upload');
+const imagePreview = document.getElementById('imagePreview');
+const imageContainer = document.getElementById('imageContainer');
+const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+const removeImageBtn = document.getElementById('removeImageBtn');
+const submitBtn = document.getElementById('submitBtn');
+const captionInput = document.getElementById('caption');
+const charCount = document.getElementById('charCount');
+
+// Image Upload
+imageInput.addEventListener('change', function(e){
+    const file = e.target.files[0];
+    
+    if(file){
+        const reader = new FileReader();
+        
+        reader.onload = function(e){
+            imagePreview.src = e.target.result;
+            imagePreview.classList.add('show');
+            uploadPlaceholder.style.display = 'none';
+            removeImageBtn.classList.add('show');
+            imageContainer.classList.add('has-image');
+            submitBtn.disabled = false;
+        }
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+// Remove Image
+removeImageBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    
+    imageInput.value = '';
+    imagePreview.src = '';
+    imagePreview.classList.remove('show');
+    uploadPlaceholder.style.display = 'block';
+    removeImageBtn.classList.remove('show');
+    imageContainer.classList.remove('has-image');
+    submitBtn.disabled = true;
+});
+
+// Character Counter
+captionInput.addEventListener('input', function(){
+    const count = this.value.length;
+    charCount.textContent = count;
+    
+    if(count > 2200){
+        charCount.style.color = '#ed4956';
+    }else{
+        charCount.style.color = '#8e8e8e';
+    }
+});
+
+// Drag and Drop Support
+imageContainer.addEventListener('dragover', function(e){
+    e.preventDefault();
+    this.style.borderColor = '#0095f6';
+    this.style.background = '#f0f8ff';
+});
+
+imageContainer.addEventListener('dragleave', function(e){
+    e.preventDefault();
+    if(!this.classList.contains('has-image')){
+        this.style.borderColor = '#dbdbdb';
+        this.style.background = '#fafafa';
+    }
+});
+
+imageContainer.addEventListener('drop', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const files = e.dataTransfer.files;
+    
+    if(files.length > 0 && files[0].type.startsWith('image/')){
+        imageInput.files = files;
+        imageInput.dispatchEvent(new Event('change'));
+    }
+    
+    this.style.borderColor = '#dbdbdb';
+    this.style.background = '#fafafa';
+});
+
+// Reset on Modal Close
+document.getElementById('exampleModal').addEventListener('hidden.bs.modal', function(){
+    imageInput.value = '';
+    imagePreview.src = '';
+    imagePreview.classList.remove('show');
+    uploadPlaceholder.style.display = 'block';
+    removeImageBtn.classList.remove('show');
+    imageContainer.classList.remove('has-image');
+    captionInput.value = '';
+    charCount.textContent = '0';
+    submitBtn.disabled = true;
+});
+</script>
