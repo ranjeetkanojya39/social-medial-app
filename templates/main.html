@@ -1,42 +1,6 @@
 {% load static %}
 
-<<<<<<< HEAD
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title">Create Post</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <form action="{% url 'upload' %}" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label class="form-label">Caption</label>
-                        <input type="text" name="caption" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Choose Image</label>
-                        <input type="file" name="image-upload" class="form-control" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">
-                        Upload Post
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-    </div>
-</div>
-=======
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -601,4 +565,5 @@ async function toggleLike(btn, postId) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
->>>>>>> 8e6df7d041b0b59b7b10caede3184c4b06cee6ff
+
+

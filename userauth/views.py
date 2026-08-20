@@ -1,127 +1,4 @@
-<<<<<<< HEAD
-from itertools import chain
-from  django . shortcuts  import  get_object_or_404, render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-#from . models import  Followers, LikePost, Post, Profile
-from django.db.models import Q
-from  . models import  Post, LikePost , Profile 
-
-
-
-# Create your views here.
-
-def signup(request):
- try:
-    if request.method == 'POST':
-        fnm=request.POST.get('fnm')
-        emailid=request.POST.get('emailid')
-        pwd=request.POST.get('pwd')
-        print(fnm,emailid,pwd)
-        my_user=User.objects.create_user(fnm,emailid,pwd)
-        my_user.save()
-        user_model = User.objects.get(username=fnm)
-        new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
-        new_profile.save()
-        if my_user is not None:
-            login(request,my_user)
-            return redirect('/')
-        return redirect('/loginn')
-    
-        
- except:
-        invalid="User already exists"
-        return render(request, 'signup.html',{'invalid':invalid})
-  
-    
- return render(request, 'signup.html')
-
-def loginn(request):
-    if request.method == 'POST':
-        fnm = request.POST.get('fnm')
-        pwd=request.POST.get('pwd')
-        print(fnm,pwd)
-        userr = authenticate(request, username=fnm, password=pwd)
-        if userr is not None:
-            login(request,userr)
-            return redirect('/')
-        
-        invalid = "invaild Credentials"
-        return render(request , 'login.html',{'invalid' : invalid})
-    
-    return render(request , 'loginn.html')
-
-def logoutt(request):
-    logout(request)
-    return redirect('/loginn/')
-
-def upload(request):
-    if request.method == 'POST':
-        user = request.user.username
-        image = request.FILES.get('image_upload')
-        caption = request.POST.get('caption')
-
-        Post.objects.create(
-            user=user,
-            image=image,
-            caption=caption
-        )
-
-        return redirect('/')
-
-    return redirect('/')
-
-
-def home(request):
-    post = Post.objects.all().order_by('-create_at')
-
-    profile = None
-    if request.user.is_authenticated:
-        profile = Profile.objects.get(user=request.user)
-
-    context = {
-        'post': post,
-        'profile': profile
-    }
-
-    return render(request, 'main.html', context)
-
-def likes(request, id):
-    if request.method == 'GET':
-        username = request.user.username
-        post = get_object_or_404(Post, id=id)
-
-        like_filter = LikePost.objects.filter(post_id=id, username=username).first()
-
-        if like_filter is None:
-            new_like = LikePost.objects.create(post_id=id, username=username)
-            post.no_of_likes = post.no_of_likes + 1
-        else:
-            like_filter.delete()
-            post.no_of_likes = post.no_of_likes - 1
-
-        post.save()
-
-        # Generate the URL for the current post's detail page
-        print(post.id)
-
-        # Redirect back to the post's detail page
-        return redirect('/#'+id)
-    
-def home_post(request,id):
-    post=Post.objects.get(id=id)
-    profile = Profile.objects.get(user=request.user)
-    context={
-        'post':post,
-        'profile':profile
-    }
-    return render(request, 'main.html',context)
-    
-
-=======
 from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -132,14 +9,14 @@ from .models import Followers, LikePost, Post, Profile
 
 
 # ---------------------------------------------------------------------------
-# Auth views
+# Auth
 # ---------------------------------------------------------------------------
 
 def signup(request):
     """Register a new user and immediately log them in."""
     if request.method == 'POST':
         username = request.POST.get('fnm', '').strip()
-        email    = request.POST.get('emailid', '').strip()
+        email = request.POST.get('emailid', '').strip()
         password = request.POST.get('pwd', '')
 
         if User.objects.filter(username=username).exists():
@@ -165,6 +42,7 @@ def loginn(request):
         password = request.POST.get('pwd', '')
 
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
             login(request, user)
             return redirect('home')
@@ -183,13 +61,13 @@ def logoutt(request):
 
 
 # ---------------------------------------------------------------------------
-# Feed / home
+# Home / Feed
 # ---------------------------------------------------------------------------
 
 @login_required(login_url='/loginn/')
 def home(request):
     """Show posts from the logged-in user and everyone they follow."""
-    # Auto-create profile if missing (handles existing users / data migration gaps)
+
     profile, _ = Profile.objects.get_or_create(
         user=request.user,
         defaults={'id_user': request.user.id},
@@ -200,11 +78,12 @@ def home(request):
     ).values_list('user', flat=True)
 
     posts = Post.objects.filter(
-        Q(user=request.user.username) | Q(user__in=following_users)
+        Q(user=request.user.username) |
+        Q(user__in=following_users)
     ).order_by('-created_at')
 
-    # Build username->profile map so each post shows the correct author avatar
-    post_usernames  = set(p.user for p in posts)
+    post_usernames = set(p.user for p in posts)
+
     author_profiles = {
         ap.user.username: ap
         for ap in Profile.objects.filter(
@@ -212,13 +91,19 @@ def home(request):
         ).select_related('user')
     }
 
-    # Attach each post's author avatar URL directly on the post object
     for p in posts:
         author = author_profiles.get(p.user)
-        p.author_avatar = author.profileimg.url if author else profile.profileimg.url
+
+        if author and author.profileimg:
+            try:
+                p.author_avatar = author.profileimg.url
+            except ValueError:
+                p.author_avatar = profile.profileimg.url
+        else:
+            p.author_avatar = profile.profileimg.url
 
     return render(request, 'main.html', {
-        'post':    posts,
+        'post': posts,
         'profile': profile,
     })
 
@@ -230,8 +115,9 @@ def home(request):
 @login_required(login_url='/loginn/')
 def upload(request):
     """Create a new post."""
+
     if request.method == 'POST':
-        image   = request.FILES.get('image_upload')
+        image = request.FILES.get('image_upload')
         caption = request.POST.get('caption', '').strip()
 
         if not image:
@@ -243,6 +129,7 @@ def upload(request):
             image=image,
             caption=caption,
         )
+
         messages.success(request, 'Post uploaded successfully.')
         return redirect('home')
 
@@ -251,7 +138,8 @@ def upload(request):
 
 @login_required(login_url='/loginn/')
 def delete(request, id):
-    """Delete a post (only the owner can delete)."""
+    """Delete a post only if the logged-in user owns it."""
+
     post = get_object_or_404(Post, id=id)
 
     if post.user != request.user.username:
@@ -259,6 +147,7 @@ def delete(request, id):
         return redirect('home')
 
     post.delete()
+
     messages.success(request, 'Post deleted.')
     return redirect('profile', id_user=request.user.username)
 
@@ -270,19 +159,27 @@ def delete(request, id):
 @login_required(login_url='/loginn/')
 def likes(request, id):
     """Toggle like/unlike on a post."""
-    post     = get_object_or_404(Post, id=id)
+
+    post = get_object_or_404(Post, id=id)
     username = request.user.username
 
-    existing = LikePost.objects.filter(post_id=id, username=username).first()
+    existing = LikePost.objects.filter(
+        post_id=id,
+        username=username
+    ).first()
 
     if existing:
         existing.delete()
-        post.no_of_likes = max(post.no_of_likes - 1, 0)   # guard against negatives
+        post.no_of_likes = max(post.no_of_likes - 1, 0)
     else:
-        LikePost.objects.create(post_id=id, username=username)
+        LikePost.objects.create(
+            post_id=id,
+            username=username
+        )
         post.no_of_likes += 1
 
     post.save()
+
     return redirect('home')
 
 
@@ -293,13 +190,18 @@ def likes(request, id):
 @login_required(login_url='/loginn/')
 def explore(request):
     """Show all posts, newest first."""
-    posts           = Post.objects.all().order_by('-created_at')
-    profile, _      = Profile.objects.get_or_create(
+
+    posts = Post.objects.all().order_by('-created_at')
+
+    profile, _ = Profile.objects.get_or_create(
         user=request.user,
         defaults={'id_user': request.user.id},
     )
 
-    return render(request, 'explore.html', {'post': posts, 'profile': profile})
+    return render(request, 'explore.html', {
+        'post': posts,
+        'profile': profile,
+    })
 
 
 # ---------------------------------------------------------------------------
@@ -308,57 +210,91 @@ def explore(request):
 
 @login_required(login_url='/loginn/')
 def profile(request, id_user):
-    """View (and optionally edit) a user's profile."""
-    user_object      = get_object_or_404(User, username=id_user)
-    user_profile     = get_object_or_404(Profile, user=user_object)
-    my_profile, _    = Profile.objects.get_or_create(
+    """View and optionally edit a user's profile."""
+
+    user_object = get_object_or_404(
+        User,
+        username=id_user
+    )
+
+    user_profile = get_object_or_404(
+        Profile,
+        user=user_object
+    )
+
+    my_profile, _ = Profile.objects.get_or_create(
         user=request.user,
         defaults={'id_user': request.user.id},
     )
 
-    user_posts       = Post.objects.filter(user=id_user).order_by('-created_at')
+    user_posts = Post.objects.filter(
+        user=id_user
+    ).order_by('-created_at')
+
     user_post_length = user_posts.count()
 
-    user_followers = Followers.objects.filter(user=id_user).count()
-    user_following = Followers.objects.filter(follower=id_user).count()
+    user_followers = Followers.objects.filter(
+        user=id_user
+    ).count()
 
-    is_own_profile = (request.user.username == id_user)
+    user_following = Followers.objects.filter(
+        follower=id_user
+    ).count()
+
+    is_own_profile = request.user.username == id_user
+
     follow_unfollow = None
 
     if not is_own_profile:
-        follow_unfollow = (
-            'Unfollow'
-            if Followers.objects.filter(follower=request.user.username, user=id_user).exists()
-            else 'Follow'
-        )
+        if Followers.objects.filter(
+            follower=request.user.username,
+            user=id_user
+        ).exists():
+            follow_unfollow = 'Unfollow'
+        else:
+            follow_unfollow = 'Follow'
 
-    # Handle profile edit (only the owner)
+    # Profile edit
     if is_own_profile and request.method == 'POST':
-        bio      = request.POST.get('bio', '').strip()
+        bio = request.POST.get('bio', '').strip()
         location = request.POST.get('location', '').strip()
-        image    = request.FILES.get('image')
+        image = request.FILES.get('image')
 
-        user_profile.bio      = bio
+        user_profile.bio = bio
         user_profile.location = location
+
         if image:
             user_profile.profileimg = image
+
         user_profile.save()
 
-        messages.success(request, 'Profile updated successfully.')
-        return redirect('profile', id_user=id_user)
+        messages.success(
+            request,
+            'Profile updated successfully.'
+        )
+
+        return redirect(
+            'profile',
+            id_user=id_user
+        )
 
     context = {
-        'user_object':       user_object,
-        'user_profile':      user_profile,
-        'user_posts':        user_posts,
-        'user_post_length':  user_post_length,
-        'profile':           my_profile,
-        'follow_unfollow':   follow_unfollow,
-        'user_followers':    user_followers,
-        'user_following':    user_following,
-        'is_own_profile':    is_own_profile,
+        'user_object': user_object,
+        'user_profile': user_profile,
+        'user_posts': user_posts,
+        'user_post_length': user_post_length,
+        'profile': my_profile,
+        'follow_unfollow': follow_unfollow,
+        'user_followers': user_followers,
+        'user_following': user_following,
+        'is_own_profile': is_own_profile,
     }
-    return render(request, 'profile.html', context)
+
+    return render(
+        request,
+        'profile.html',
+        context
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -368,22 +304,49 @@ def profile(request, id_user):
 @login_required(login_url='/loginn/')
 def follow(request):
     """Follow or unfollow another user."""
+
     if request.method == 'POST':
-        follower = request.POST.get('follower', '').strip()
-        user     = request.POST.get('user', '').strip()
+        follower = request.POST.get(
+            'follower',
+            ''
+        ).strip()
 
-        # Prevent self-follow
+        user = request.POST.get(
+            'user',
+            ''
+        ).strip()
+
+        # Always use logged-in user as follower
+        follower = request.user.username
+
         if follower == user:
-            messages.error(request, "You can't follow yourself.")
-            return redirect('profile', id_user=user)
+            messages.error(
+                request,
+                "You can't follow yourself."
+            )
 
-        obj = Followers.objects.filter(follower=follower, user=user).first()
+            return redirect(
+                'profile',
+                id_user=user
+            )
+
+        obj = Followers.objects.filter(
+            follower=follower,
+            user=user
+        ).first()
+
         if obj:
             obj.delete()
         else:
-            Followers.objects.create(follower=follower, user=user)
+            Followers.objects.create(
+                follower=follower,
+                user=user
+            )
 
-        return redirect('profile', id_user=user)
+        return redirect(
+            'profile',
+            id_user=user
+        )
 
     return redirect('home')
 
@@ -395,19 +358,30 @@ def follow(request):
 @login_required(login_url='/loginn/')
 def search_results(request):
     """Search users by username and posts by caption."""
-    query = request.GET.get('q', '').strip()
 
-    users = Profile.objects.filter(
-        user__username__icontains=query
-    ).select_related('user') if query else Profile.objects.none()
+    query = request.GET.get(
+        'q',
+        ''
+    ).strip()
 
-    posts = Post.objects.filter(
-        caption__icontains=query
-    ).order_by('-created_at') if query else Post.objects.none()
+    if query:
+        users = Profile.objects.filter(
+            user__username__icontains=query
+        ).select_related('user')
 
-    return render(request, 'search_user.html', {
-        'query': query,
-        'users': users,
-        'posts': posts,
-    })
->>>>>>> 8e6df7d041b0b59b7b10caede3184c4b06cee6ff
+        posts = Post.objects.filter(
+            caption__icontains=query
+        ).order_by('-created_at')
+    else:
+        users = Profile.objects.none()
+        posts = Post.objects.none()
+
+    return render(
+        request,
+        'search_user.html',
+        {
+            'query': query,
+            'users': users,
+            'posts': posts,
+        }
+    )
