@@ -545,7 +545,9 @@ body {
              data-likes="{{ pos.no_of_likes }}"
              data-date="{{ pos.created_at|date:'U' }}">
 
-            <img src="{{ pos.image.url }}" alt="Post by {{ pos.user }}" loading="lazy">
+           {% if pos.image %}
+<img src="{{ pos.image.url }}" alt="Post by {{ pos.user }}" loading="lazy">
+{% endif %}
 
             <!-- Likes badge -->
             <div class="likes-badge">
